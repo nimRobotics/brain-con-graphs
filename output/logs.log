@@ -1,0 +1,40 @@
+2023-03-24 11:34:21,652 - INFO - Successfully loaded data from ./stem_data/27_C.nirs
+2023-03-24 11:34:21,652 - INFO - Data shape: (18335, 3, 20), Stimulus data shape: (18335, 2)
+2023-03-24 11:34:21,914 - INFO - Successfully loaded data from ./stem_data/27_C.nirs
+2023-03-24 11:34:21,914 - INFO - Data shape: (18335, 3, 20), Stimulus data shape: (18335, 2)
+2023-03-24 11:34:22,108 - INFO - Successfully loaded data from ./stem_data/11_C.nirs
+2023-03-24 11:34:22,108 - INFO - Data shape: (14882, 3, 20), Stimulus data shape: (14882, 2)
+2023-03-24 11:34:22,421 - INFO - Successfully loaded data from ./stem_data/25_C.nirs
+2023-03-24 11:34:22,421 - INFO - Data shape: (24176, 3, 20), Stimulus data shape: (24176, 2)
+2023-03-24 11:34:22,610 - INFO - Successfully loaded data from ./stem_data/29_C.nirs
+2023-03-24 11:34:22,610 - INFO - Data shape: (13815, 3, 20), Stimulus data shape: (13815, 2)
+2023-03-24 11:34:22,777 - INFO - Successfully loaded data from ./stem_data/13_C.nirs
+2023-03-24 11:34:22,777 - INFO - Data shape: (13021, 3, 20), Stimulus data shape: (13021, 2)
+2023-03-24 11:34:22,946 - INFO - Successfully loaded data from ./stem_data/17_C.nirs
+2023-03-24 11:34:22,946 - INFO - Data shape: (14471, 3, 20), Stimulus data shape: (14471, 2)
+2023-03-24 11:34:23,153 - INFO - Successfully loaded data from ./stem_data/33_C.nirs
+2023-03-24 11:34:23,153 - INFO - Data shape: (16977, 3, 20), Stimulus data shape: (16977, 2)
+2023-03-24 11:34:23,313 - INFO - Successfully loaded data from ./stem_data/15_C.nirs
+2023-03-24 11:34:23,313 - INFO - Data shape: (11760, 3, 20), Stimulus data shape: (11760, 2)
+2023-03-24 11:34:23,613 - INFO - Successfully loaded data from ./stem_data/34_C.nirs
+2023-03-24 11:34:23,613 - INFO - Data shape: (35689, 3, 20), Stimulus data shape: (35689, 2)
+2023-03-24 11:34:23,796 - INFO - Successfully loaded data from ./stem_data/26_C.nirs
+2023-03-24 11:34:23,796 - INFO - Data shape: (15909, 3, 20), Stimulus data shape: (15909, 2)
+2023-03-24 11:34:24,131 - INFO - Successfully loaded data from ./stem_data/12_C.nirs
+2023-03-24 11:34:24,132 - INFO - Data shape: (23249, 3, 20), Stimulus data shape: (23249, 2)
+2023-03-24 11:34:24,315 - INFO - Successfully loaded data from ./stem_data/24_C.nirs
+2023-03-24 11:34:24,315 - INFO - Data shape: (12961, 3, 20), Stimulus data shape: (12961, 2)
+2023-03-24 11:34:24,491 - INFO - Successfully loaded data from ./stem_data/28_C.nirs
+2023-03-24 11:34:24,491 - INFO - Data shape: (14568, 3, 20), Stimulus data shape: (14568, 2)
+2023-03-24 11:34:24,831 - INFO - Successfully loaded data from ./stem_data/20_C.nirs
+2023-03-24 11:34:24,831 - INFO - Data shape: (33633, 3, 20), Stimulus data shape: (33633, 2)
+2023-03-24 11:34:25,248 - INFO - Successfully loaded data from ./stem_data/16_C.nirs
+2023-03-24 11:34:25,248 - INFO - Data shape: (39049, 3, 20), Stimulus data shape: (39049, 2)
+2023-03-24 11:34:25,506 - INFO - Successfully loaded data from ./stem_data/22_C.nirs
+2023-03-24 11:34:25,507 - INFO - Data shape: (18545, 3, 20), Stimulus data shape: (18545, 2)
+2023-03-24 11:34:25,917 - INFO - Successfully loaded data from ./stem_data/30_C.nirs
+2023-03-24 11:34:25,917 - INFO - Data shape: (38334, 3, 20), Stimulus data shape: (38334, 2)
+2023-03-24 11:34:26,288 - INFO - Successfully loaded data from ./stem_data/18_C.nirs
+2023-03-24 11:34:26,289 - INFO - Data shape: (22788, 3, 20), Stimulus data shape: (22788, 2)
+2023-03-24 11:34:26,641 - INFO - Successfully loaded data from ./stem_data/14_C.nirs
+2023-03-24 11:34:26,641 - INFO - Data shape: (34661, 3, 20), Stimulus data shape: (34661, 2)
