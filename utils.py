@@ -117,7 +117,7 @@ class RandomBinGraph:
         self.binarize_type = binarize_type  
         self.binarize_param = binarize_param
 
-    def generate(self, min_weight: float = -1, max_weight: float = 1) -> np.ndarray:
+    def generate(self, min_weight: float = None, max_weight: float = None) -> np.ndarray:
         '''
         Generate a random binary graph with given nodes and edges/sparsity
 
