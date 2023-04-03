@@ -22,16 +22,8 @@ class RandomGraphAnalyzer:
         self.analysis_type = analysis_type
         self.nnodes = fc_matrix.shape[0]
         self.nedges = int(self.nnodes * (self.nnodes - 1) / 2)
-        
-        if analysis_type == 'sparsity':
-            self.sparsity = np.linspace(0, 1, 100)
-            self.threshold = None
-        elif analysis_type == 'threshold':
-            self.threshold = np.linspace(0, 1, 100)
-            self.sparsity = None
-        else:
-            raise ValueError('Invalid analysis_type. Must be either "sparsity" or "threshold".')
-
+        self.search_space = np.linspace(0, 1, 100)
+        assert self.analysis_type in ['sparsity', 'threshold'], 'Invalid analysis_type. Must be either "sparsity" or "threshold".'
         self.features = features
 
     def gen_random_graphs(self):
@@ -40,9 +32,9 @@ class RandomGraphAnalyzer:
         '''
         if self.analysis_type == 'sparsity':
             # generate n_rnd_graphs random graphs for each sparsity value
-            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=sparsity).generate() for _ in range(self.n_rnd_graphs)] for sparsity in self.sparsity]
+            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=sparsity).generate() for _ in range(self.n_rnd_graphs)] for sparsity in self.search_space]
         elif self.analysis_type == 'threshold':
-            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=threshold).generate(min_weight=np.nanmin(self.fc_matrix), max_weight=np.nanmax(self.fc_matrix)) for _ in range(self.n_rnd_graphs)] for threshold in self.threshold]
+            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=threshold).generate(min_weight=np.nanmin(self.fc_matrix), max_weight=np.nanmax(self.fc_matrix)) for _ in range(self.n_rnd_graphs)] for threshold in self.search_space]
         return self.random_graphs
 
     def compute_features(self):
@@ -51,13 +43,7 @@ class RandomGraphAnalyzer:
         '''
         self.random_graphs_features = {}
         self.fc_graph_features = {}
-        # choose threshold or sparsity based on self.analysis_type
-        if self.analysis_type == 'sparsity':
-            time_points = self.sparsity
-        elif self.analysis_type == 'threshold':
-            time_points = self.threshold
-
-        for i, sparsity in enumerate(time_points):
+        for i, sparsity in enumerate(self.search_space):
             for feature in self.features:
                 if feature == 'global_efficiency':
                     self.random_graphs_features['global_efficiency_{}'.format(sparsity)] = [bct.efficiency_bin(graph) for graph in self.random_graphs[i]]
@@ -77,9 +63,9 @@ class RandomGraphAnalyzer:
         Plot the features of the random graphs.
         '''
         for i, feature in enumerate(self.features):
-            plt.errorbar(self.sparsity, [np.mean(self.random_graphs_features['{}_{}'.format(feature, sparsity)]) for sparsity in self.sparsity], 
-                         yerr=[np.std(self.random_graphs_features['{}_{}'.format(feature, sparsity)]) for sparsity in self.sparsity], label='Random Graphs')
-            plt.plot(self.sparsity, [self.fc_graph_features['{}_{}'.format(feature, sparsity)] for sparsity in self.sparsity], label='Real Graph', marker='o')
+            plt.errorbar(self.search_space, [np.mean(self.random_graphs_features['{}_{}'.format(feature, sparsity)]) for sparsity in self.search_space], 
+                         yerr=[np.std(self.random_graphs_features['{}_{}'.format(feature, sparsity)]) for sparsity in self.search_space], label='Random Graphs')
+            plt.plot(self.search_space, [self.fc_graph_features['{}_{}'.format(feature, sparsity)] for sparsity in self.search_space], label='Real Graph', marker='o')
             plt.xlabel('Sparsity')
             plt.ylabel(feature)
             plt.legend()
