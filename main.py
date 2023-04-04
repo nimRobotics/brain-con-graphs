@@ -79,11 +79,16 @@ class RandomGraphAnalyzer:
             plt.savefig('output/{}_{}.png'.format(feature, self.analysis_type), dpi=600)
             plt.clf()
 
-    def compute_auc(self):
+    def compute_auc(self, feature: str, start, end):
         '''
-        Compute the AUC for a given feature.
+        Compute the area under the curve (AUC) for the given feature.
         '''
-        pass
+        assert feature in self.features, 'Invalid feature. Must be either "global_efficiency", "local_efficiency", or "clustering_coefficient".'
+        auc = 0
+        for i, sparsity in enumerate(self.search_space):
+            if sparsity >= start and sparsity <= end:
+                auc += (self.fc_graph_features['{}_{}'.format(feature, sparsity)] - np.mean(self.random_graphs_features['{}_{}'.format(feature, sparsity)])) * (self.search_space[i+1] - self.search_space[i])
+        return auc
 
 
 if __name__ == '__main__':
