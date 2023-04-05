@@ -1,4 +1,5 @@
 import numpy as np
+import math
 np.random.seed(3)
 
 class BinarizeMatrix:
@@ -188,3 +189,20 @@ class RandomBinGraph:
         matrix = np.triu(matrix) + np.triu(matrix, k=1).T
 
         return matrix
+
+def matrix_from_upper_triangle(data):
+    """Convert flattened upper triangle to matrix"""
+    if not isinstance(data, np.ndarray):
+        data = np.array(data)
+    n = int(math.sqrt(2 * data.shape[0] + 0.25) + 0.5)
+    # print('n = ', n)
+    # Create an empty matrix of zeros
+    mat = np.zeros((n, n))
+    # Fill the upper triangle of the matrix using the flattened array
+    for i in range(n):
+        for j in range(i+1, n):
+            index = int(i*n + j - (i*(i+1))/2 - i - 1)
+            mat[i][j] = data[index]
+    # Fill the lower triangle of the matrix using the upper triangle
+    mat = mat + mat.T - np.diag(mat.diagonal())
+    return mat  
