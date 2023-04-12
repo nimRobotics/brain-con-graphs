@@ -51,8 +51,11 @@ class BinarizeMatrix:
         # create a new binary matrix with the same shape as the input matrix
         bin_matrix = np.zeros_like(matrix)
 
-        # set all values above the threshold to 1
-        bin_matrix[matrix > self.binarize_param] = 1
+        # zscores of connectivity matrix
+        zscores = np.arctanh(matrix) # Fisher's z transform
+
+        # threshold the connectivity matrix based on zscores and the given threshold
+        bin_matrix[abs(zscores) > self.binarize_param] = 1
 
         return bin_matrix
 
