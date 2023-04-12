@@ -46,17 +46,30 @@ class RandomGraphAnalyzer:
         for i, binparam in enumerate(self.search_space):
             for feature in self.features:
                 if feature == 'global_efficiency':
-                    self.random_graphs_features['global_efficiency_{}'.format(binparam)] = [bct.efficiency_bin(graph) for graph in self.random_graphs[i]]
-                    self.fc_graph_features['global_efficiency_{}'.format(binparam)] = [bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type, binarize_param=binparam).binarize()) for fc_matrix in self.fc_matrices]
+                    self.random_graphs_features[f'global_efficiency_{binparam}'] = [
+                        bct.efficiency_bin(graph) for graph in self.random_graphs[i]]
+                    self.fc_graph_features[f'global_efficiency_{binparam}'] = [
+                        bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type,
+                                                                binarize_param=binparam).binarize())
+                        for fc_matrix in self.fc_matrices]
                 elif feature == 'local_efficiency':
-                    self.random_graphs_features['local_efficiency_{}'.format(binparam)] = [bct.efficiency_bin(graph, local=True) for graph in self.random_graphs[i]]
-                    self.fc_graph_features['local_efficiency_{}'.format(binparam)] = [bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type, binarize_param=binparam).binarize()) for fc_matrix in self.fc_matrices]
+                    self.random_graphs_features[f'local_efficiency_{binparam}'] = [
+                        bct.efficiency_bin(graph, local=True) for graph in self.random_graphs[i]]
+                    self.fc_graph_features[f'local_efficiency_{binparam}'] = [
+                        bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type,
+                                                                binarize_param=binparam).binarize(), local=True)
+                        for fc_matrix in self.fc_matrices]
                 elif feature == 'clustering_coefficient':
-                    self.random_graphs_features['clustering_coefficient_{}'.format(binparam)] = [np.mean(bct.clustering_coef_bu(graph)) for graph in self.random_graphs[i]]
-                    self.fc_graph_features['clustering_coefficient_{}'.format(binparam)] = [np.mean(bct.clustering_coef_bu(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type, binarize_param=binparam).binarize())) for fc_matrix in self.fc_matrices]
+                    self.random_graphs_features[f'clustering_coefficient_{binparam}'] = [
+                        np.mean(bct.clustering_coef_bu(graph)) for graph in self.random_graphs[i]]
+                    self.fc_graph_features[f'clustering_coefficient_{binparam}'] = [
+                        np.mean(bct.clustering_coef_bu(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type,
+                                                                            binarize_param=binparam).binarize()))
+                        for fc_matrix in self.fc_matrices]
                 else:
                     raise ValueError('Invalid feature. Must be either "global_efficiency", "local_efficiency", or "clustering_coefficient".')
         return self.random_graphs_features, self.fc_graph_features
+
 
     def plot_features(self, filename: str=''):
         '''
@@ -115,7 +128,7 @@ class RandomGraphAnalyzer:
             df.to_csv(f'output/random_graphs_{feature}_{self.analysis_type}.csv', index=False)
 
 if __name__ == '__main__':
-    ngraphs = 1000
+    ngraphs = 10
     stims = ['NHAHR', 'FHAHR', 'NHALR', 'FHALR']
     stim = 'FHAHR'
 
@@ -129,7 +142,10 @@ if __name__ == '__main__':
         # print(data_df)
         fc_matrices = [utils.matrix_from_upper_triangle(data_df.iloc[i, :].values) for i in range(1, data_df.shape[0])]
 
-        x = RandomGraphAnalyzer(fc_matrices, n_rnd_graphs=ngraphs, analysis_type='sparsity', features=['global_efficiency', 'local_efficiency', 'clustering_coefficient'])
+        x = RandomGraphAnalyzer(fc_matrices, 
+                                n_rnd_graphs=ngraphs, 
+                                analysis_type='threshold', 
+                                features=['global_efficiency', 'local_efficiency', 'clustering_coefficient'])
         rgraphs = x.gen_random_graphs()
         print(len(rgraphs))
         print(len(rgraphs[0]))
