@@ -32,9 +32,21 @@ class RandomGraphAnalyzer:
         '''
         if self.analysis_type == 'sparsity':
             # generate n_rnd_graphs random graphs for each sparsity value
-            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=sparsity).generate() for _ in range(self.n_rnd_graphs)] for sparsity in self.search_space]
+            self.random_graphs = [[utils.RandomBinGraph(
+                self.nnodes,
+                binarize_type=self.analysis_type,
+                binarize_param=sparsity).generate()
+                for _ in range(self.n_rnd_graphs)]
+                for sparsity in self.search_space]
         elif self.analysis_type == 'threshold':
-            self.random_graphs = [[utils.RandomBinGraph(self.nnodes, binarize_type=self.analysis_type, binarize_param=threshold).generate(min_weight=np.nanmin(np.array(self.fc_matrices)), max_weight=np.nanmax(np.array(self.fc_matrices))) for _ in range(self.n_rnd_graphs)] for threshold in self.search_space]
+            self.random_graphs = [[utils.RandomBinGraph(
+                self.nnodes,
+                binarize_type=self.analysis_type,
+                binarize_param=threshold).generate(
+                    min_weight=np.nanmin(np.array(self.fc_matrices)),
+                    max_weight=np.nanmax(np.array(self.fc_matrices)))
+                for _ in range(self.n_rnd_graphs)]
+                for threshold in self.search_space]
         return self.random_graphs
 
     def compute_features(self):
@@ -54,10 +66,10 @@ class RandomGraphAnalyzer:
                         for fc_matrix in self.fc_matrices]
                 elif feature == 'local_efficiency':
                     self.random_graphs_features[f'local_efficiency_{binparam}'] = [
-                        bct.efficiency_bin(graph, local=True) for graph in self.random_graphs[i]]
+                        np.mean(bct.efficiency_bin(graph, local=True)) for graph in self.random_graphs[i]]
                     self.fc_graph_features[f'local_efficiency_{binparam}'] = [
-                        bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type,
-                                                                binarize_param=binparam).binarize(), local=True)
+                        np.mean(bct.efficiency_bin(utils.BinarizeMatrix(fc_matrix, binarize_type=self.analysis_type,
+                                                                binarize_param=binparam).binarize(), local=True))
                         for fc_matrix in self.fc_matrices]
                 elif feature == 'clustering_coefficient':
                     self.random_graphs_features[f'clustering_coefficient_{binparam}'] = [
@@ -73,7 +85,7 @@ class RandomGraphAnalyzer:
 
     def plot_features(self, filename: str=''):
         '''
-        Plot the features of the random graphs.
+        Plot the features of the random graphs and real graphs for each sparsity/threshold value.
         '''
         for i, feature in enumerate(self.features):
             plt.errorbar(self.search_space, 
@@ -100,24 +112,25 @@ class RandomGraphAnalyzer:
         '''
         auc = {}
         for feature in self.features:
+            print('Feature: ',feature)
             auc[feature] = {}
             y_values = [self.fc_graph_features['{}_{}'.format(feature, sparsity)] for sparsity in self.search_space]
             y_values = np.array(y_values).T
             # np.savetxt('./output/test.csv', y_values, delimiter=',')
+            # print(y_values)
+            print('Yval shape',y_values.shape)
             x_value = np.array(self.search_space)
+            # print(x_value)
+            print('xval_shape',x_value.shape)
             for i, y_value in enumerate(y_values):
-                # print((x_value >= min_sparsity) & (x_value <= max_sparsity))
-                # print(y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-                # print(x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-                auc[feature][i] = np.trapz(y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)], x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-        # save auc to csv with feature as the column and graph as the row
-        # df = pd.DataFrame()
-        # for feature in self.features:
-        #     df[feature] = auc[feature].values()
-        # df.to_csv(f'output/random_graphs_auc_{self.analysis_type}.csv', index=False)
+                # print('\nA: ',(x_value >= min_sparsity) & (x_value <= max_sparsity))
+                # print('\nB: ',y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
+                # print('\nC: ',x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
+                auc[feature][i] = np.trapz(y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)],
+                                            x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
         return auc        
 
-    def save_results(self):
+    def save_results(self, filename: str=''):
         '''
         save csv for each feature with sparsity as the column and graph as the row
         '''
@@ -125,7 +138,7 @@ class RandomGraphAnalyzer:
             df = pd.DataFrame()
             for binparam in self.search_space:
                 df[binparam] = self.fc_graph_features[f'{feature}_{binparam}']
-            df.to_csv(f'output/random_graphs_{feature}_{self.analysis_type}.csv', index=False)
+            df.to_csv(f'output/{filename}_fc_graphs_{feature}_{self.analysis_type}.csv', index=False)
 
 if __name__ == '__main__':
     ngraphs = 10
@@ -136,6 +149,7 @@ if __name__ == '__main__':
 
     auc_data = {}
     for stim in stims:
+        print(f'Processing {stim} data...')
         data_df = df[df[3] == stim]
         print(data_df)
         data_df = data_df.iloc[:, 4:]    # remove the first 4 columns
@@ -151,7 +165,7 @@ if __name__ == '__main__':
         print(len(rgraphs[0]))
         x.compute_features()
         x.plot_features(filename='amelia_{}'.format(stim))
-        x.save_results()
+        x.save_results(filename=stim)
         auc = x.compute_auc(min_sparsity=0.1, max_sparsity=0.4)
         auc_data[stim] = auc
 
@@ -160,11 +174,15 @@ if __name__ == '__main__':
         max_length = max(len(auc_data[stim][feature]) for stim in stims)
         df = pd.DataFrame()
         for stim in stims:
-            # Pad data with NAN to make all data the same length
+            # pad data with NAN to make all data the same length
             auc_values = auc_data[stim][feature].values()
             padded_values = list(auc_values) + [np.NAN] * (max_length - len(auc_values))
             df[stim] = padded_values
         df.to_csv(f'output/random_graphs_auc_{feature}.csv', index=False)
+
+
+
+
 
 
     
