@@ -9,13 +9,18 @@ import utils
 np.random.seed(123)
 
 class RandomGraphAnalyzer:
-    def __init__(self, fc_matrices: list, n_rnd_graphs: int=1000, analysis_type: str='sparsity', features: list=['global_efficiency', 'local_efficiency', 'clustering_coefficient']):
+    def __init__(self, fc_matrices: list, n_rnd_graphs: int = 1000,
+                analysis_type: str = 'sparsity',
+                features: list = ['global_efficiency', 'local_efficiency', 'clustering_coefficient']):
         '''
         Parameters:
             fc_matrices (list): a list of FC matrices
             n_rnd_graphs (int): the number of random graphs to be generated
-            analysis_type (str): the type of analysis to be performed. Options are 'sparsity' or 'threshold'
-            features (list): the features to be analyzed. Options are 'global_efficiency', 'local_efficiency', 'clustering_coefficient'
+            analysis_type (str): the type of analysis to be performed.
+                Options are 'sparsity' or 'threshold'
+            features (list): the features to be analyzed.
+                Options are 'global_efficiency', 'local_efficiency',
+                'clustering_coefficient'
         '''
         self.fc_matrices = fc_matrices
         self.n_rnd_graphs = n_rnd_graphs
@@ -23,7 +28,8 @@ class RandomGraphAnalyzer:
         self.nnodes = fc_matrices[0].shape[0]
         self.nedges = int(self.nnodes * (self.nnodes - 1) / 2)
         self.search_space = np.linspace(0, 1, 100)
-        assert self.analysis_type in ['sparsity', 'threshold'], 'Invalid analysis_type. Must be either "sparsity" or "threshold".'
+        assert self.analysis_type in ['sparsity', 'threshold'], \
+            'Invalid analysis_type. Must be either "sparsity" or "threshold".'
         self.features = features
 
     def gen_random_graphs(self):
