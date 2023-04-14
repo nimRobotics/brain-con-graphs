@@ -88,7 +88,6 @@ class RandomGraphAnalyzer:
                     raise ValueError('Invalid feature. Must be either "global_efficiency", "local_efficiency", or "clustering_coefficient".')
         return self.random_graphs_features, self.fc_graph_features
 
-
     def plot_features(self, filename: str=''):
         '''
         Plot the features of the random graphs and real graphs for each sparsity/threshold value.
@@ -112,29 +111,33 @@ class RandomGraphAnalyzer:
             plt.savefig('output/{}_{}_{}.png'.format(filename, feature, self.analysis_type), dpi=600)
             plt.clf()
 
-    def compute_auc(self, min_sparsity: float=0.1, max_sparsity: float=0.4):
+    def compute_auc(self, min_binparam: float=0.1, max_binparam: float=0.4):
         '''
-        Compute the AUC for a given sparsity range for fc graphs.
+        compute the AUC for a given binparam range for fc graphs.
+        params:
+            min_binparam: minimum binparam value
+            max_binparam: maximum binparam value
+        returns:
+            auc: dictionary of AUC values for each feature
         '''
         auc = {}
+        mean = {}
         for feature in self.features:
-            print('Feature: ',feature)
             auc[feature] = {}
-            y_values = [self.fc_graph_features['{}_{}'.format(feature, sparsity)] for sparsity in self.search_space]
+            mean[feature] = {}
+            y_values = [self.fc_graph_features['{}_{}'.format(feature, binparam)] for binparam in self.search_space]
             y_values = np.array(y_values).T
-            # np.savetxt('./output/test.csv', y_values, delimiter=',')
-            # print(y_values)
             print('Yval shape',y_values.shape)
             x_value = np.array(self.search_space)
-            # print(x_value)
             print('xval_shape',x_value.shape)
             for i, y_value in enumerate(y_values):
-                # print('\nA: ',(x_value >= min_sparsity) & (x_value <= max_sparsity))
-                # print('\nB: ',y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-                # print('\nC: ',x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-                auc[feature][i] = np.trapz(y_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)],
-                                            x_value[(x_value >= min_sparsity) & (x_value <= max_sparsity)])
-        return auc        
+                # print('\nA: ',(x_value >= min_binparam) & (x_value <= max_binparam))
+                # print('\nB: ',y_value[(x_value >= min_binparam) & (x_value <= max_binparam)])
+                # print('\nC: ',x_value[(x_value >= min_binparam) & (x_value <= max_binparam)])
+                auc[feature][i] = np.trapz(y_value[(x_value >= min_binparam) & (x_value <= max_binparam)],
+                                            x_value[(x_value >= min_binparam) & (x_value <= max_binparam)])
+                mean[feature][i] = np.mean(y_value[(x_value >= min_binparam) & (x_value <= max_binparam)])
+        return auc, mean
 
     def save_results(self, filename: str=''):
         '''
@@ -146,6 +149,7 @@ class RandomGraphAnalyzer:
                 df[binparam] = self.fc_graph_features[f'{feature}_{binparam}']
             df.to_csv(f'output/{filename}_fc_graphs_{feature}_{self.analysis_type}.csv', index=False)
 
+
 if __name__ == '__main__':
     ngraphs = 10
     stims = ['NHAHR', 'FHAHR', 'NHALR', 'FHALR']
@@ -154,6 +158,7 @@ if __name__ == '__main__':
     df = pd.read_csv('./input/funcCon.csv', header=None)
 
     auc_data = {}
+    mean_data = {}
     for stim in stims:
         print(f'Processing {stim} data...')
         data_df = df[df[3] == stim]
@@ -172,11 +177,13 @@ if __name__ == '__main__':
         x.compute_features()
         x.plot_features(filename='amelia_{}'.format(stim))
         x.save_results(filename=stim)
-        auc = x.compute_auc(min_sparsity=0.1, max_sparsity=0.4)
+        auc, mean = x.compute_auc(min_binparam=0.1, max_binparam=0.4)
         auc_data[stim] = auc
+        mean_data[stim] = mean
+
 
     # save auc to csv with stim as the column
-    for feature in ['global_efficiency', 'local_efficiency', 'clustering_coefficient']:
+    for feature in x.features:
         max_length = max(len(auc_data[stim][feature]) for stim in stims)
         df = pd.DataFrame()
         for stim in stims:
@@ -184,7 +191,18 @@ if __name__ == '__main__':
             auc_values = auc_data[stim][feature].values()
             padded_values = list(auc_values) + [np.NAN] * (max_length - len(auc_values))
             df[stim] = padded_values
-        df.to_csv(f'output/random_graphs_auc_{feature}.csv', index=False)
+        df.to_csv(f'output/fc_graphs_auc_{feature}.csv', index=False)
+
+    # save mean to csv with stim as the column
+    for feature in x.features:
+        max_length = max(len(mean_data[stim][feature]) for stim in stims)
+        df = pd.DataFrame()
+        for stim in stims:
+            # pad data with NAN to make all data the same length
+            mean_values = mean_data[stim][feature].values()
+            padded_values = list(mean_values) + [np.NAN] * (max_length - len(mean_values))
+            df[stim] = padded_values
+        df.to_csv(f'output/fc_graphs_mean_{feature}.csv', index=False)
 
 
 
