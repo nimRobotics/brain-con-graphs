@@ -6,9 +6,13 @@ import bct as bct
 import numpy as np
 import pandas as pd
 
+
+    
+
 if __name__ == '__main__':
+    stim = 'FHAHR'
     df = pd.read_csv('./input/funcCon.csv', header=None)
-    data_df = df[df[3] == 'NHAHR']
+    data_df = df[df[3] == stim]
     data_df = data_df.iloc[:, 4:]    # remove the first 4 columns
     data_df = data_df.apply(pd.to_numeric, errors='coerce')   # convert to numeric
     data_df = data_df.reset_index(drop=True)    # reset index
@@ -20,7 +24,7 @@ if __name__ == '__main__':
     print(fc_array)
     print(data_df_)
 
-    # # FC data from single partiopnatn
+    # # FC data from single participant
     # data = data_df.iloc[6, :].values
     # fc_array = utils.matrix_from_upper_triangle(data)
     # print(fc_array)
@@ -42,10 +46,32 @@ if __name__ == '__main__':
     # add jitter 0.1 to 0.2 to node coordinates to avoid overlapping edges
     node_coords = node_coords + np.random.uniform(-0.2, 0.2, size=node_coords.shape)
 
-    # plot using networkx
-    G = nx.DiGraph(bin_matrix)
-    nx.draw(G, with_labels=True, pos=dict(zip(range(11), node_coords)), labels=dict(zip(range(11), node_labels)))
-    plt.show()
+    # # plot using networkx
+    # G = nx.DiGraph(bin_matrix)
+    # nx.draw(G, with_labels=True, pos=dict(zip(range(11), node_coords)), labels=dict(zip(range(11), node_labels)))
+    # plt.show()
+
+    # Create the animation with threshold values from 0 to 1
+    fig, ax = plt.subplots()
+    threshold = 0
+    bin_fc_array = utils.BinarizeMatrix(fc_array, 'threshold', threshold).binarize()
+    G = nx.DiGraph(bin_fc_array)
+    nx.draw(G, with_labels=True, pos=dict(zip(range(11), node_coords)), labels=dict(zip(range(11), node_labels)), ax=ax)
+
+
+    # Define the update function for the animation
+    def update(threshold):
+        bin_fc_array = utils.BinarizeMatrix(fc_array, 'threshold', threshold).binarize()
+        G = nx.DiGraph(bin_fc_array)
+        ax.clear()
+        nx.draw(G, with_labels=True, pos=dict(zip(range(11), node_coords)), labels=dict(zip(range(11), node_labels)), ax=ax)
+        ax.set_title('Threshold: '+str(round(threshold, 2)))
+
+    # Create the animation
+    anim = FuncAnimation(fig, update, frames=np.arange(0, 1, 0.1), interval=1000)
+    anim.save('output/animation_'+stim+'.mp4', writer='ffmpeg', fps=1)
+    
+
 
 
 
