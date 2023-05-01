@@ -61,6 +61,7 @@ class RandomGraphAnalyzer:
         '''
         self.random_graphs_features = {}
         self.fc_graph_features = {}
+        print('############ self.fc_matrices.shape: ', np.array(self.fc_matrices).shape)
         for i, binparam in enumerate(self.search_space):
             for feature in self.features:
                 if feature == 'global_efficiency':
@@ -165,8 +166,8 @@ if __name__ == '__main__':
         print(data_df)
         data_df = data_df.iloc[:, 4:]    # remove the first 4 columns
         # print(data_df)
-        fc_matrices = [utils.matrix_from_upper_triangle(data_df.iloc[i, :].values) for i in range(1, data_df.shape[0])]
-
+        fc_matrices = [utils.matrix_from_upper_triangle(data_df.iloc[i, :].values) for i in range(data_df.shape[0])]
+        print("fc_matrices len: ", len(fc_matrices))
         x = RandomGraphAnalyzer(fc_matrices, 
                                 n_rnd_graphs=ngraphs, 
                                 analysis_type='threshold', 

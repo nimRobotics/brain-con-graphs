@@ -2,3 +2,5 @@
 *.png
 *.csv
 *.mp4
+*.xlsx
+./input/*
